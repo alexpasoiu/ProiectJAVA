@@ -19,16 +19,12 @@ public class Server {
     private Carriers carrierEnum;
 
     private HashMap<Socket, ClientWrapper> clientList;
-    // private Communication database;
 
     public Server(int port){
         clientList = new HashMap<>();
         carrierEnum = new Carriers("Digi", "vodafone", "Orange");
         contactMap = new HashMap<>();
         this.port = port;//atribuire
-        //MainDB mainDB = new MainDB();
-        //database = mainDB.initDB();
-        //loadContacts();
 
         try {
             serverSocket = new ServerSocket(this.port);//instantiere
@@ -53,7 +49,6 @@ public class Server {
                 }
             };
             thread.start();//executa functia de run
-            //sendInitialData(clientWrapper);
         }catch(Exception e){
             e.printStackTrace();
         }

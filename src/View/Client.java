@@ -2,6 +2,8 @@ package View;
 
 import Model.Info;
 
+import javax.swing.*;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -36,6 +38,57 @@ public class Client {
                 System.out.println("Couldnt connect to server...");
                 foundHost = false;
             }
+        }
+        thread = new Thread(){
+            @Override
+            public void run() {
+                receiveObject();
+                this.interrupt();
+            }
+        };
+        thread.start();
+    }
+    public void sendObject(Object object) {
+        if (foundHost) {
+            try {
+                this.objectOutputStream.writeObject(object);
+            } catch (IOException io) {
+                io.printStackTrace();
+            }
+        }
+    }
+    public void receiveObject() {
+        while (foundHost) {
+            try {
+                Object obj = objectInputStream.readObject();//variabila "obj" returneaza obiectul de pe inputstream care a fost trimis de server
+                handle((Message) obj);
+            } catch (Exception e){
+                foundHost=false;
+                e.printStackTrace();
+            }
+        }
+    }
+    public void handle(Message message){
+        if(message.action.equals(Action.ADD)){
+            contacts.put(message.ID, message.contact);
+            Info contact = message.contact;
+            ui.updateComboBox();
+        }
+        if(message.action.equals(Action.FAIL)){
+            JOptionPane.showMessageDialog(null,"Contactul este deja existent");
+        }
+        if(message.action.equals(Action.SUCCESS)){
+            JOptionPane.showMessageDialog(null,"Contactul a fost adaugat in baza de date");
+        }
+        if(message.action.equals((Action.REMOVE))){
+            contacts.remove(message.ID);
+            ui.updateComboBox();
+            JOptionPane.showMessageDialog(null,"Contactul a fost sters din baza de date");
+        }
+        if(message.action.equals(Action.MODIFY)){
+            contacts.replace(message.ID,message.contact);
+            ui.updateComboBox();
+            JOptionPane.showMessageDialog(null,"Contactul a fost modificat");
         }
     }
 }

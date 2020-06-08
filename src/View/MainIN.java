@@ -14,5 +14,6 @@ public class MainIN {
         Client client = new Client(5000, contactMap, ui);
 
         ui.client = client;
+
     }
 }
